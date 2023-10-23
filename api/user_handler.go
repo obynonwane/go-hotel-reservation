@@ -1,23 +1,29 @@
 package api
 
 import (
+	"context"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/obynonwane/hotel-reservation/db"
-	"github.com/obynonwane/hotel-reservation/types"
 )
 
 type UserHandler struct {
 	userStore db.UserStore
 }
 
-// create a constructor
-func NewUserHandler() *UserHandler {
-
+// create a constructor function
+func NewUserHandler(userStore db.UserStore) *UserHandler {
+	return &UserHandler{
+		userStore: userStore,
+	}
 }
 
 func (h *UserHandler) HandleGetUser(c *fiber.Ctx) error {
-	id := c.Params("id")
-	user, err := h.userStore.GetUserById(id)
+	var (
+		id  = c.Params("id")
+		ctx = context.Background()
+	)
+	user, err := h.userStore.GetUserByID(ctx, id)
 	if err != nil {
 		return err
 	}
@@ -25,9 +31,5 @@ func (h *UserHandler) HandleGetUser(c *fiber.Ctx) error {
 }
 
 func (h *UserHandler) HandleGetUsers(c *fiber.Ctx) error {
-	u := types.User{
-		FirstName: "Obinna",
-		LastName:  "Johnson",
-	}
-	return c.JSON(u)
+	return c.JSON(nil)
 }
