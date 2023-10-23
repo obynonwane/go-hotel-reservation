@@ -14,6 +14,7 @@ const userColl = "users"
 // Specifies methods that any type can implement
 type UserStore interface {
 	GetUserByID(context.Context, string) (*types.User, error)
+	GetUsers(context.Context) ([]*types.User, error)
 }
 
 // this struct is intended to implement UserStore interface
@@ -54,4 +55,17 @@ func (s *MongoUserStore) GetUserByID(ctx context.Context, id string) (*types.Use
 	}
 
 	return &user, nil
+}
+
+func (s *MongoUserStore) GetUsers(ctx context.Context) ([]*types.User, error) {
+	var users []*types.User
+	cur, err := s.coll.Find(ctx, bson.M{})
+	if err != nil {
+		return nil, err
+	}
+	if err := cur.Decode(&users); err != nil {
+		return nil, err
+	}
+
+	return users, nil
 }
